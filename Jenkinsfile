@@ -1,12 +1,15 @@
 pipeline {
   agent any
   environment {
-    APPSYSID = '00f35c601b2b9410fe0165f8bc4bcb06'
+    APPSYSID = '167bc2662f0021100c8eae5df699b680'
     BRANCH = "${BRANCH_NAME}"
     CREDENTIALS = '18be2029-2e62-4070-8828-dbb3aa39f0f0'
-    DEVENV = 'https://devinstance.service-now.com/'
-    TESTENV = 'https://testinstance.service-now.com/'
-    PRODENV = 'https://prodinstance.service-now.com/'
+    DEVENV = 'https://dev65108.service-now.com/'
+    DEVCRED = 'snow-outlook'
+    TESTENV = 'https://dev105694.service-now.com/'
+    TESTCRED = 'snow-mmc'
+    PRODENV = 'https://dev77308.service-now.com/'
+    PRODCRED = 'smow-try'
     TESTSUITEID = 'b1ae55eedb541410874fccd8139619fb'
   }
   stages {
@@ -17,8 +20,8 @@ pipeline {
         }
       }
       steps {
-        snApplyChanges(appSysId: "${APPSYSID}", branchName: "${BRANCH}", url: "${DEVENV}", credentialsId: "${CREDENTIALS}")
-        snPublishApp(credentialsId: "${CREDENTIALS}", appSysId: "${APPSYSID}", obtainVersionAutomatically: true, url: "${DEVENV}")
+        snApplyChanges(appSysId: "${APPSYSID}", branchName: "${BRANCH}", url: "${DEVENV}", credentialsId: "${DEVCRED}")
+        snPublishApp(credentialsId: "${DEVCRED}", appSysId: "${APPSYSID}", obtainVersionAutomatically: true, url: "${DEVENV}")
       }
     }
     stage('Test') {
@@ -28,8 +31,8 @@ pipeline {
         }
       }
       steps {
-        snInstallApp(credentialsId: "${CREDENTIALS}", url: "${TESTENV}", appSysId: "${APPSYSID}")
-        snRunTestSuite(credentialsId: "${CREDENTIALS}", url: "${TESTENV}", testSuiteSysId: "${TESTSUITEID}", withResults: true)
+        snInstallApp(credentialsId: "${TESTCRED}", url: "${TESTENV}", appSysId: "${APPSYSID}")
+        snRunTestSuite(credentialsId: "${TESTCRED}", url: "${TESTENV}", testSuiteSysId: "${TESTSUITEID}", withResults: true)
       }
     }
     stage('Deploy to Prod') {
@@ -37,7 +40,7 @@ pipeline {
         branch 'master'
       }
       steps {
-        snInstallApp(credentialsId: "${CREDENTIALS}", url: "${PRODENV}", appSysId: "${APPSYSID}")
+        snInstallApp(credentialsId: "${PRODCRED}", url: "${PRODENV}", appSysId: "${APPSYSID}")
       }
     }
   }
